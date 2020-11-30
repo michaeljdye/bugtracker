@@ -19,15 +19,22 @@ const issueSchema = new mongoose.Schema({
 
 const Issue = mongoose.model('Issue', issueSchema)
 
+app.get('/issues', async (req, res) => {
+  try {
+    const issues = await Issue.find()
+    console.log(issues)
+    res.json(issues)
+  } catch (error) {
+    console.log(error)
+  }
+})
+
 app.post('/create-issue', (req, res) => {
   const { name, description } = req.body
-  console.log(name, description)
   const issue = new Issue({ name, description })
   issue.save(error => {
     if (error) return console.log(error)
   })
-
-  console.log(issue)
 })
 
 const db = mongoose.connection

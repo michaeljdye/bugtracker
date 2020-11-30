@@ -1,8 +1,25 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 function App() {
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
+  const [issues, setIssues] = useState([])
+
+  const getIssues = async () => {
+    const url = 'http://localhost:4000/issues'
+
+    try {
+      const data = await fetch(url).then(response => response.json())
+
+      console.log(data)
+
+      setIssues(data)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  useEffect(getIssues, [])
 
   const handleSubmit = async e => {
     e.preventDefault()
@@ -45,6 +62,18 @@ function App() {
         </div>
         <button>Submit</button>
       </form>
+      <div>
+        <h2>All issues</h2>
+        <ul>
+          {issues.length &&
+            issues.map(({ name, description }) => (
+              <li>
+                <h3>{name}</h3>
+                <p>{description}</p>
+              </li>
+            ))}
+        </ul>
+      </div>
     </div>
   )
 }
