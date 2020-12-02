@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import Issues from '../components/Issues'
 import IssueForm from '../components/IssueForm'
+import Layout from '../components/Layout'
 
 const Home = () => {
   const [issues, setIssues] = useState([])
@@ -22,11 +23,9 @@ const Home = () => {
   useEffect(getIssues, [])
 
   return (
-    <div>
-      <h1>Bugtracker</h1>
-      <IssueForm />
+    <Layout>
       <Issues issues={issues} />
-    </div>
+    </Layout>
   )
 }
 

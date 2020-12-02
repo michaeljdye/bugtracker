@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import Button from 'react-bootstrap/Button'
+import Form from 'react-bootstrap/Form'
 
 const IssueForm = () => {
   const [name, setName] = useState('')
@@ -21,29 +22,31 @@ const IssueForm = () => {
   }
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div>
-        <label htmlFor='name'>
+    <Form onSubmit={handleSubmit}>
+      <Form.Group>
+        <Form.Label htmlFor='name'>
           Name:{' '}
-          <input
+          <Form.Control
             id='name'
             type='text'
             onChange={e => setName(e.target.value)}
           />
-        </label>
-      </div>
-      <div>
-        <label htmlFor='description'>
+        </Form.Label>
+      </Form.Group>
+      <Form.Group>
+        <Form.Label htmlFor='description'>
           Description:{' '}
-          <input
+          <Form.Control
             id='description'
             type='text'
             onChange={e => setDescription(e.target.value)}
           />
-        </label>
-      </div>
-      <Button>Submit</Button>
-    </form>
+        </Form.Label>
+      </Form.Group>
+      <Button variant='primary' type='submit'>
+        Submit
+      </Button>
+    </Form>
   )
 }
 
