@@ -1,8 +1,9 @@
+import React from 'react'
 import Navbar from 'react-bootstrap/Navbar'
 import Nav from 'react-bootstrap/Nav'
 import { Link } from 'react-router-dom'
 
-const Header = () => (
+const Header: React.FC = () => (
   <Navbar bg='dark' variant='dark'>
     <Navbar.Brand href='/'>Bugtracker</Navbar.Brand>
     <Nav>

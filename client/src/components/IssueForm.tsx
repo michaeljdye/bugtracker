@@ -1,18 +1,18 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import Button from 'react-bootstrap/Button'
 import Form from 'react-bootstrap/Form'
 
-const IssueForm = () => {
+const IssueForm: React.FC = () => {
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
 
-  const handleSubmit = async e => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
     const url = 'http://localhost:4000/create-issue'
-    const data = { name, description }
+    const data: { name: string; description: string; } = { name, description }
 
-    const response = await fetch(url, {
+    await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
