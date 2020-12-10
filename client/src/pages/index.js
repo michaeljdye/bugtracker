@@ -1,31 +1,207 @@
-import { useState, useEffect } from 'react'
-import Issues from '../components/Issues'
-import IssueForm from '../components/IssueForm'
+import React, { useState, useEffect } from 'react'
+import getVenues from './api/api'
 import Layout from '../components/Layout'
+import Search from './containers/Search'
+import Locations from './containers/Locations'
+import GoogleMap from './containers/GoogleMap'
+import { Main, Wrapper } from './styles/appStyles'
 
+/**s
+ * @description React class component - inits maps, gets venues,
+ */
 const Home = () => {
-  const [issues, setIssues] = useState([])
+  const [venue, setVenue] = useState('')
+  const [venues, setVenues] = useState([])
+  const [map, setMap] = useState({})
+  const [markers, setMarkers] = useState([])
+  const [listItems, setListItems] = useState([])
+  const [hasMap, setHasMap] = false
 
-  const getIssues = async () => {
-    const url = 'http://localhost:4000/issues'
+  /**
+   * @description Update state with retrieved venues.
+   * If error, init map with stored venues and log error.
+   */
+  useEffect(() => {
+    if (venues.length === 0) {
+      getVenues()
+        .then(res => {
+          if (!res) return
+          localStorage.setItem('venues', JSON.stringify(res))
+          setVenues(res.data.response.groups[0].items)
+          setListItems(res.data.response.groups[0].items)
+          initMap()
+        })
+        .catch(() => {
+          const storedVenues = JSON.parse(localStorage.getItem('venues'))
 
-    try {
-      const data = await fetch(url).then(response => response.json())
+          setVenues(storedVenues.data.response.groups[0].items)
+          setListItems(storedVenues.data.response.groups[0].items)
 
-      console.log(data)
+          console.log('Failed to connect to FourSquare API')
+        })
+    }
+  }, [])
 
-      setIssues(data)
-    } catch (error) {
-      console.log(error)
+  /**
+   * @description Init Google Map and populate with venue markers.
+   * Create info window and set event listener to add location-specific content.
+   * Re-render with updated markers each time function is invoked.
+   * * Use Google Places Library to retrieve additional location data
+   */
+  const initMap = venues => {
+    if (!window.google) {
+      console.log('Failed to connect to Google Maps API')
+      return
+    }
+
+    const mapCenter = { lat: 36.162177, lng: -86.849023 }
+
+    var map = new window.google.maps.Map(
+      window.document.getElementById('map'),
+      {
+        center: mapCenter,
+        zoom: 20,
+      }
+    )
+
+    setMarkers(state => (markers.length = 0))
+
+    const infoWindow = new window.google.maps.InfoWindow()
+
+    var bounds = new window.google.maps.LatLngBounds()
+
+    const markers = []
+
+    venues.forEach(ven => {
+      const { name, location } = ven.venue
+      const latLng = { lat: location.lat, lng: location.lng }
+
+      var marker = new window.google.maps.Marker({
+        position: latLng,
+        map: map,
+        animation: window.google.maps.Animation.DROP,
+      })
+
+      bounds.extend(latLng)
+
+      const getVenueDetails = results => {
+        if (!results) return
+
+        const { rating, opening_hours = '', formatted_address } = results[0]
+        const content = `<div class="info-window" role="dialog" aria-labelledby="dialog-title">
+                          <h3 id="dialog-title" class="m-md">${name}</h3>
+                          <p>${location.address || formatted_address}</p>
+                          <div class="info-window__content">
+                            <p class="m-md info-window__rating"><span class="text--bold">Rating:</span> ${rating}</p>
+                            <p class="m-md text--bold ${
+                              opening_hours.open_now === true
+                                ? 'color--success'
+                                : 'color--warn'
+                            }">${
+          opening_hours.open_now === true ? 'Open' : 'Closed'
+        }<p>
+                          </div>
+                        </div>`
+
+        marker.addListener('click', () => {
+          const animateMarker = marker => {
+            marker.setAnimation(window.google.maps.Animation.BOUNCE)
+            setTimeout(() => marker.setAnimation(null), 750)
+          }
+
+          infoWindow.open(map, marker, animateMarker(marker))
+          infoWindow.setContent(content)
+        })
+      }
+
+      const request = {
+        query: name,
+        fields: ['rating', 'opening_hours', 'formatted_address'],
+        locationBias: {
+          lat: location.lat,
+          lng: location.lng,
+        },
+      }
+
+      const service = new window.google.maps.places.PlacesService(map)
+      service.findPlaceFromQuery(request, getVenueDetails)
+
+      markers.push([marker, name])
+    })
+
+    setMarkers(markers)
+
+    map.fitBounds(bounds)
+    setHasMap(true)
+  }
+
+  /**
+   * @description Test if venue has been passed
+   * and call initMap with new venues.
+   * @param {string} searchedVenue - filtered venues.
+   */
+  const updateMarkers = searchedVenue => {
+    if (searchedVenue) {
+      initMap(searchedVenue)
     }
   }
 
-  useEffect(getIssues, [])
+  /**
+   * @description Show info window of corresponding marker.
+   * @param { string } venueName - name of clicked venue.
+   */
+  const showMarkerInfo = venueName => {
+    const filteredMarker = markers.filter(marker => {
+      return marker[1].toLowerCase() === venueName.toLowerCase()
+    })
 
+    if (filteredMarker.length === 0) return
+
+    window.google.maps.event.trigger(filteredMarker[0][0], 'click')
+  }
+
+  /**
+   * @description Update state with filtered venues
+   * and call updateMarkers func with venues.
+   * @param { string } venue - name of searched venue.
+   */
+  const getLocation = venue => {
+    if (!venue) {
+      initMap()
+      setVenue(venue)
+      setListItems(venues)
+      return
+    }
+
+    const searchedVenue = venues.filter(ven =>
+      ven.venue.name.toLowerCase().includes(venue.toString().toLowerCase())
+    )
+
+    setVenue(venue)
+    setListItems(searchedVenue)
+    updateMarkers(searchedVenue)
+  }
+
+  /**
+   * @description Render app.
+   * Wrap component in ThemeProvider, so app has access to theme styles
+   */
   return (
-    <Layout>
-      <Issues issues={issues} />
-    </Layout>
+    <>
+      <Layout>
+        <div className='row-1'>
+          <Search getLocation={getLocation} />
+          <Locations
+            showMarkerInfo={showMarkerInfo}
+            venue={venue}
+            listItems={listItems}
+          />
+        </div>
+        <div className='row-2'>
+          <GoogleMap hasMap={hasMap} initMap={initMap} venues={venues} />
+        </div>
+      </Layout>
+    </>
   )
 }
 
