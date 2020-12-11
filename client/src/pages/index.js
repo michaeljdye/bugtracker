@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react'
-import getVenues from './api/api'
-import Layout from '../components/Layout'
-import Search from './containers/Search'
-import Locations from './containers/Locations'
-import GoogleMap from './containers/GoogleMap'
-import { Main, Wrapper } from './styles/appStyles'
+import { getVenues } from '../api/api.tsx'
+import Layout from '../components/Layout.tsx'
+import Search from '../components/Search.tsx'
+import Locations from '../components/Locations.tsx'
+import GoogleMap from '../components/GoogleMap.tsx'
 
 /**s
  * @description React class component - inits maps, gets venues,
@@ -15,7 +14,7 @@ const Home = () => {
   const [map, setMap] = useState({})
   const [markers, setMarkers] = useState([])
   const [listItems, setListItems] = useState([])
-  const [hasMap, setHasMap] = false
+  const [hasMap, setHasMap] = useState([])
 
   /**
    * @description Update state with retrieved venues.
@@ -64,7 +63,7 @@ const Home = () => {
       }
     )
 
-    setMarkers(state => (markers.length = 0))
+    setMarkers(prevState => (prevState.length = 0))
 
     const infoWindow = new window.google.maps.InfoWindow()
 
@@ -72,23 +71,24 @@ const Home = () => {
 
     const markers = []
 
-    venues.forEach(ven => {
-      const { name, location } = ven.venue
-      const latLng = { lat: location.lat, lng: location.lng }
+    venues &&
+      venues.forEach(ven => {
+        const { name, location } = ven.venue
+        const latLng = { lat: location.lat, lng: location.lng }
 
-      var marker = new window.google.maps.Marker({
-        position: latLng,
-        map: map,
-        animation: window.google.maps.Animation.DROP,
-      })
+        var marker = new window.google.maps.Marker({
+          position: latLng,
+          map: map,
+          animation: window.google.maps.Animation.DROP,
+        })
 
-      bounds.extend(latLng)
+        bounds.extend(latLng)
 
-      const getVenueDetails = results => {
-        if (!results) return
+        const getVenueDetails = results => {
+          if (!results) return
 
-        const { rating, opening_hours = '', formatted_address } = results[0]
-        const content = `<div class="info-window" role="dialog" aria-labelledby="dialog-title">
+          const { rating, opening_hours = '', formatted_address } = results[0]
+          const content = `<div class="info-window" role="dialog" aria-labelledby="dialog-title">
                           <h3 id="dialog-title" class="m-md">${name}</h3>
                           <p>${location.address || formatted_address}</p>
                           <div class="info-window__content">
@@ -98,36 +98,36 @@ const Home = () => {
                                 ? 'color--success'
                                 : 'color--warn'
                             }">${
-          opening_hours.open_now === true ? 'Open' : 'Closed'
-        }<p>
+            opening_hours.open_now === true ? 'Open' : 'Closed'
+          }<p>
                           </div>
                         </div>`
 
-        marker.addListener('click', () => {
-          const animateMarker = marker => {
-            marker.setAnimation(window.google.maps.Animation.BOUNCE)
-            setTimeout(() => marker.setAnimation(null), 750)
-          }
+          marker.addListener('click', () => {
+            const animateMarker = marker => {
+              marker.setAnimation(window.google.maps.Animation.BOUNCE)
+              setTimeout(() => marker.setAnimation(null), 750)
+            }
 
-          infoWindow.open(map, marker, animateMarker(marker))
-          infoWindow.setContent(content)
-        })
-      }
+            infoWindow.open(map, marker, animateMarker(marker))
+            infoWindow.setContent(content)
+          })
+        }
 
-      const request = {
-        query: name,
-        fields: ['rating', 'opening_hours', 'formatted_address'],
-        locationBias: {
-          lat: location.lat,
-          lng: location.lng,
-        },
-      }
+        const request = {
+          query: name,
+          fields: ['rating', 'opening_hours', 'formatted_address'],
+          locationBias: {
+            lat: location.lat,
+            lng: location.lng,
+          },
+        }
 
-      const service = new window.google.maps.places.PlacesService(map)
-      service.findPlaceFromQuery(request, getVenueDetails)
+        const service = new window.google.maps.places.PlacesService(map)
+        service.findPlaceFromQuery(request, getVenueDetails)
 
-      markers.push([marker, name])
-    })
+        markers.push([marker, name])
+      })
 
     setMarkers(markers)
 

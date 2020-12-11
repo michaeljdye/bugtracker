@@ -39,3 +39,5 @@ const Locations: React.FC<props> = ({showMarkerInfo, listItems}) => {
       </nav>
     );
 }
+
+export default Locations
