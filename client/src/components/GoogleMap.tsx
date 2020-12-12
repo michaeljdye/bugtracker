@@ -1,5 +1,6 @@
 import React, {useEffect} from 'react';
 import loadScript from '../utils/loadScript';
+import styled from '@emotion/styled';
 
 type props = {
     initMap: () => {},
@@ -38,18 +39,35 @@ const GoogleMap: React.FC<props> = ({initMap, hasMap}) => {
    }, [])
 
     return (
-      <div role="application" aria-label="Map with restaurants">
+      <MapSection role="application" aria-label="Map with restaurants">
         {hasMap === false ? (
-          <div>
+          <MapErrorWrapper>
             <h2>No Connection</h2>
             <p>Please connect to internet to display map.</p>
-          </div>
+          </MapErrorWrapper>
         ) : (
           ''
         )}
-        <div id="map" />;
-      </div>
+        <GMap id="map" />;
+      </MapSection>
     );
 }
+
+const GMap = styled.div`
+  height: 100%;
+`;
+
+const MapSection = styled.section`
+  height: 85rem;
+  margin: 0;
+  padding: 0;
+`;
+
+const MapErrorWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 15.625rem;
+`;
 
 export default GoogleMap

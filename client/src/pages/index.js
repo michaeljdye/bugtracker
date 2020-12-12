@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
-import { getVenues } from '../api/api.tsx'
+import styled from '@emotion/styled'
+import { getVenues } from '../api/api.ts'
 import Layout from '../components/Layout.tsx'
 import Search from '../components/Search.tsx'
 import Locations from '../components/Locations.tsx'
@@ -189,20 +190,33 @@ const Home = () => {
   return (
     <>
       <Layout>
-        <div className='row-1'>
-          <Search getLocation={getLocation} />
-          <Locations
-            showMarkerInfo={showMarkerInfo}
-            venue={venue}
-            listItems={listItems}
-          />
-        </div>
-        <div className='row-2'>
-          <GoogleMap hasMap={hasMap} initMap={initMap} venues={venues} />
-        </div>
+        <Wrapper>
+          <Main>
+            <div className='row-1'>
+              <Search getLocation={getLocation} />
+              <Locations
+                showMarkerInfo={showMarkerInfo}
+                venue={venue}
+                listItems={listItems}
+              />
+            </div>
+            <div className='row-2'>
+              <GoogleMap hasMap={hasMap} initMap={initMap} venues={venues} />
+            </div>
+          </Main>
+        </Wrapper>
       </Layout>
     </>
   )
 }
+
+const Wrapper = styled.div`
+  background-color: var(--colorGreyLight);
+`
+
+const Main = styled.main`
+  display: grid;
+  grid-template-columns: 300px 1fr;
+`
 
 export default Home
