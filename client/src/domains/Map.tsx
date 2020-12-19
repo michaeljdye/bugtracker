@@ -33,7 +33,7 @@ const Map: React.FC<Props> = ({venues, activeMarker}) => {
   return (
     <div style={{ height: '100vh', width: '100%' }}>
       <GoogleMapReact
-        bootstrapURLKeys={{ key: 'AIzaSyDBBlr6-M5k81x_a4D8PQGCYm1BdTHABUA' }}
+        bootstrapURLKeys={{ key: process.env.REACT_APP_GOOGLE_MAPS_API_KEY || '' }}
         defaultCenter={center}
         defaultZoom={zoom}
       >
