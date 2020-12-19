@@ -1,5 +1,6 @@
 import React from 'react'
 import GoogleMapReact from 'google-map-react'
+import styled from '@emotion/styled'
 import Marker from '../components/Marker'
 
 interface Venue {
@@ -15,20 +16,19 @@ interface Venue {
   };
 }
 
-type props = {
-  venues: Venue[],
+type Props = {
+  venues: Venue[];
+  activeMarker: string
 }
 
 
-const Map: React.FC<props> = ({venues}) => {
+const Map: React.FC<Props> = ({venues, activeMarker}) => {
   const center = {
     lat: 36.160834,
     lng: -86.856013,
   }
 
   const zoom = 15
-
-  console.log(venues)
 
   return (
     <div style={{ height: '100vh', width: '100%' }}>
@@ -37,10 +37,11 @@ const Map: React.FC<props> = ({venues}) => {
         defaultCenter={center}
         defaultZoom={zoom}
       >
-        {venues.map(({venue: { location: { lat, lng }}}) => (
-          <Marker     
+        {venues.map(({venue: {id, location: { lat, lng }}}) => (
+          <Marker    
             lat={lat}
             lng={lng}
+            isActive={activeMarker === id ? true : false}
             />
           )
         )}

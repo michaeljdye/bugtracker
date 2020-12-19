@@ -10,18 +10,18 @@ interface Venue {
         }
     }
 
-type props = {
-    venues: Venue[]
+type Props = {
+    venues: Venue[];
+    showMarkerInfo: (id: string) => {};
 }
 
-const Locations: React.FC<props> =  ({venues}) => {
+const Locations: React.FC<Props> =  ({venues, showMarkerInfo}) => {
     return (
         <LocationsSection>
             <Venues>
                 {venues.map(({venue: { id, name }}) => (
-                <li key={id}>{name}</li>
+                <Venue key={id} onClick={() => showMarkerInfo(id)}>{name}</Venue>
                 ))}
-                
             </Venues>
         </LocationsSection>
     )
@@ -35,6 +35,10 @@ const Venues = styled.ul`
     list-style: none;
     margin: 0;
     padding: 0;
+`
+
+const Venue = styled.li`
+    cursor: pointer;
 `
 
 export default Locations

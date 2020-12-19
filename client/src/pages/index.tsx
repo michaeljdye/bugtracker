@@ -7,6 +7,7 @@ import Locations from '../domains/Locations'
 
 const Home: React.FC = () => {
     const [venues, setVenues] = useState([])
+    const [activeMarker, setActiveMarker] = useState('')
 
     const getVenues = async () => {
         const endpoint = 'https://api.foursquare.com/v2/venues/explore?';
@@ -28,11 +29,16 @@ const Home: React.FC = () => {
         getVenues()
         }, [])
 
+    const showMarkerInfo = (id: string) => {
+        setActiveMarker(id)
+        return 'hi'
+    }
+
     return (
         <Layout>
             <Main>
-                <Locations venues={venues} />
-                <Map venues={venues}/>
+                <Locations venues={venues} showMarkerInfo={showMarkerInfo} />
+                <Map venues={venues} activeMarker={activeMarker}/>
             </Main>
         </Layout>
     )
