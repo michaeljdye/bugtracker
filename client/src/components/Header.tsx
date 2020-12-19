@@ -1,29 +1,22 @@
-import React from 'react';
-import styled from '@emotion/styled';
+import React from 'react'
+import styled from '@emotion/styled'
 
-/**
- * @description Stateless functional - return app header.
- */
-const Header: React.FC = () => (
-    <HeaderSection>
-      <Title>Explore The Nations</Title>
-    </HeaderSection>
-  );
+const Header: React.FC = () => {
+    return (
+        <HeaderSection>
+            <h1>Explore the Nations</h1>
+        </HeaderSection>
+    )
+}
 
-export const HeaderSection = styled.header`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-image: linear-gradient(
-    150deg,
-    var(--colorSecondary) 40%,
-    var(--colorPrimary) 60%
-  );
-  height: 7rem;
-`;
+const HeaderSection = styled.div`
+    background: #000;
+    padding: 10px 0;
+    color: #fff;
 
-export const Title = styled.h1`
-  color: var(--colorWhite);
-`;
+    h1 {
+        text-align: center;
+    }
+`
 
 export default Header
