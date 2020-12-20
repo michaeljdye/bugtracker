@@ -37,11 +37,12 @@ const Map: React.FC<Props> = ({venues, activeMarker}) => {
         defaultCenter={center}
         defaultZoom={zoom}
       >
-        {venues.map(({venue: {id, location: { lat, lng }}}) => (
+        {venues.map(({venue: {id, name, location: { lat, lng,  }}}) => (
           <Marker    
             lat={lat}
             lng={lng}
             isActive={activeMarker === id ? true : false}
+            name={name}
             />
           )
         )}
